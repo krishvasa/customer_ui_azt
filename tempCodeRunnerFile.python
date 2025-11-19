@@ -1,0 +1,41 @@
+import matplotlib.pyplot as plt
+
+def draw_individual_t_accounts(accounts, filename="t_accounts_individual.png"):
+    # Create figure grid based on number of accounts
+    n = len(accounts)
+    cols = 2
+    rows = (n + 1) // cols
+    
+    fig, axes = plt.subplots(rows, cols, figsize=(12, rows * 3))
+    axes = axes.flatten()
+    
+    for ax, (account, entries) in zip(axes, accounts.items()):
+        ax.axis("off")
+        ax.set_title(account, fontsize=11, fontweight="bold")
+        
+        # Separate debits and credits
+        debit_entries = [(date, amt) for date, side, amt in entries if side == "Dr"]
+        credit_entries = [(date, amt) for date, side, amt in entries if side == "Cr"]
+        
+        max_len = max(len(debit_entries), len(credit_entries))
+        debit_entries += [("", "")] * (max_len - len(debit_entries))
+        credit_entries += [("", "")] * (max_len - len(credit_entries))
+        
+        table_data = []
+        for (d_date, d_amt), (c_date, c_amt) in zip(debit_entries, credit_entries):
+            table_data.append([f"{d_date} {d_amt}", f"{c_date} {c_amt}"])
+        
+        ax.table(cellText=table_data, colLabels=["Debit (Dr)", "Credit (Cr)"], 
+                 loc="center", cellLoc="center", colWidths=[0.5,0.5])
+    
+    # Hide unused axes if any
+    for extra_ax in axes[len(accounts):]:
+        extra_ax.axis("off")
+    
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300)
+    plt.close()
+    return filename
+
+# Generate image with individual T-accounts
+draw_individual_t_accounts(accounts)
