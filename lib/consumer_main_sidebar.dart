@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'consumer_dashboard_page.dart';
 import 'consumer_search_products_page.dart';
-import '../pages/consumer/consumer_my_cart_page.dart';
-import '../pages/consumer/consumer_checkout_page.dart';
+import 'consumer_my_cart_page.dart';
+import 'consumer_checkout_page.dart';
 import 'consumer_sidebar_item.dart';
 
 class ConsumerMainSidebar extends StatelessWidget {

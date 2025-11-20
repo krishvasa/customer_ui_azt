@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'customer_dashboard.dart'; // Import the dashboard page
 import 'customer_search.dart'; // Import the search page
 import 'customer_sidemenu.dart'; // Import the side menu file
@@ -113,6 +113,149 @@ class _MainScreenState extends State<MainScreen> {
               child: IndexedStack(
                 index: _selectedIndex,
                 // Use the 'pages' list defined above
+                children: pages,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+} */
+
+import 'package:flutter/material.dart';
+import 'sfdashboard.dart'; // Import the dashboard page
+import 'sfsearch.dart'; // Import the search page
+import 'sfsidemenu.dart'; // Import the side menu file
+import 'sfcart.dart'; // Import the new cart page
+import 'sfproductcards.dart'; // Import the Product class
+import 'sfcheckout.dart'; // Import checkout page
+import 'sfrecentorders.dart'; // Import the new orders page
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Dashboard',
+      theme: ThemeData(
+        primaryColor: Colors.white,
+        scaffoldBackgroundColor: Colors.white,
+      ),
+      home: const MainScreen(),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+
+  // This list holds the products in our cart
+  final List<Product> _cart = [];
+  
+  // This list holds the confirmed orders (List of Lists)
+  final List<List<Product>> _recentOrders = [];
+
+  // Callback to add a product to the cart
+  void _addToCart(Product product) {
+    setState(() {
+      _cart.add(product);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${product.name} added to cart!'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  // Callback to remove a product from the cart
+  void _removeFromCart(Product product) {
+    setState(() {
+      _cart.remove(product);
+    });
+  }
+
+  // Logic to handle successful payment
+  void _handlePaymentSuccess() {
+    setState(() {
+      if (_cart.isNotEmpty) {
+        // Create a copy of current cart and add to orders
+        _recentOrders.insert(0, List.from(_cart));
+        // Clear the cart
+        _cart.clear();
+      }
+    });
+  }
+
+  void _onItemTapped(int index) {
+    // Logout is now index 5 because we added "Your Orders" at 4
+    if (index == 5) {
+      debugPrint('Logout tapped');
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Define the pages
+    final List<Widget> pages = <Widget>[
+      DashboardPage(
+        onNavigate: _onItemTapped, // Pass the navigation callback
+      ),
+      SearchPage(
+        onAddToCart: _addToCart,
+        onRemoveFromCart: _removeFromCart,
+        cart: _cart,
+      ),
+      MyCartPage(
+        cart: _cart,
+        onRemoveFromCart: _removeFromCart,
+        onItemTapped: _onItemTapped,
+      ),
+      CheckoutPage(
+        cart: _cart,
+        onPaymentSuccess: _handlePaymentSuccess, // Pass the callback
+      ),
+      RecentOrdersPage(
+        orders: _recentOrders, // Pass the history
+      ),
+    ];
+
+    return Scaffold(
+      body: SafeArea(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SideMenu(
+              selectedIndex: _selectedIndex,
+              onItemTapped: _onItemTapped,
+            ),
+            Expanded(
+              // IndexedStack preserves state when switching tabs
+              child: IndexedStack(
+                index: _selectedIndex,
                 children: pages,
               ),
             ),
